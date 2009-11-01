@@ -7,4 +7,8 @@ scripts URL to your favourite feed reader.
 Please make sure you're not hammering Pixivs servers with a lot of
 unneccesary requests.
 
+DANGER WILL ROBINSON: This obviously makes something that was private
+(your bookmarks) public. If you don't want anyone to see those, you
+should probably put this script behing .htaccess protection or such.
+
 -- L. Diener / lorenzd@gmail.com
