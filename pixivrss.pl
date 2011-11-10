@@ -61,7 +61,7 @@ if( !$res->is_success() ) {
 
 # Preparse
 my $html = $res->content();
-$html =~ s/.*<div class="search_a2_result linkStyleWorks">(.*)<div class="clear">.*<style type="text\/css"><!--.*/$1/s;
+$html =~ s/<section id="search-result" class="image-list">(.*)<\/section>/$1/s;
 
 # Output header
 print <<RSS
@@ -80,7 +80,7 @@ RSS
 ;
 
 # Parse and output.
-while( $html =~ /<a href="([^"]*)".*?src="([^"]*)".*?alt="([^"]*)".*?<\/li>/gi ) {
+while( $html =~ /<a href="(\/member_illust.php\?mode=medium&amp;illust_id=\d*)".*?data-src="([^"]*)".*?<h1>([^<>]*)<\/h1>.*?<a href=.*?>([^<>]*)<\/a>/gi ) {
 
 	# Get fields.
 	my $desc = $3;
