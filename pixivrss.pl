@@ -80,7 +80,7 @@ RSS
 ;
 
 # Parse and output.
-while( $html =~ /<a href="(\/member_illust.php\?mode=medium&amp;illust_id=\d*)".*?data-src="([^"]*)".*?<h1>([^<>]*)<\/h1>.*?<a href=.*?>([^<>]*)<\/a>/gi ) {
+while( $html =~ /<a href="([^"]*)".*?<img src="([^"]*)".*?<h1>([^<>]*)<\/h1>.*?<a href=.*?>([^<>]*)<\/a>/gi ) {
 
 	# Get fields.
 	my $desc = $3;
@@ -106,14 +106,13 @@ while( $html =~ /<a href="(\/member_illust.php\?mode=medium&amp;illust_id=\d*)".
 	}
 	
 	# Build RSS item.
-	$url =~ s/&/&amp;/;
 	print "<item>\n";
 	print "<title>$user: $desc</title>\n";
 	print "<description><![CDATA[";
 	print '<img src="' . $IMAGE_BASE_URL . $thumb_file . '" />';
 	print "]]></description>\n";
-	print "<guid>http://www.pixiv.net/$url</guid>\n";
-	print "<link>http://www.pixiv.net/$url</link>\n";
+	print "<guid>http://www.pixiv.net$url</guid>\n";
+	print "<link>http://www.pixiv.net$url</link>\n";
 	print "</item>\n";
 }
 
