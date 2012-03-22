@@ -1,22 +1,22 @@
 #!/usr/bin/perl
 
-# pixivrss.pl - Pixiv "bookmarks" RSS feed generator.                
+# pixivrss.pl - Pixiv "bookmarks" RSS feed generator.
 
 # (c) 2009 L. Diener, licensed under the WTFPL, see below.
 
 #             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-#                     Version 2, December 2004           
-#                                                        
-#  Copyright (C) 2004 Sam Hocevar                        
-#   14 rue de Plaisance, 75014 Paris, France             
+#                     Version 2, December 2004
+#
+#  Copyright (C) 2004 Sam Hocevar
+#   14 rue de Plaisance, 75014 Paris, France
 #  Everyone is permitted to copy and distribute verbatim or modified
 #  copies of this license document, and changing it is allowed as long
-#  as the name is changed.                                            
-#                                                                     
-#             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE             
-#    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION  
-#                                                                     
-#   0. You just DO WHAT THE FUCK YOU WANT TO.                         
+#  as the name is changed.
+#
+#             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+#    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+#
+#   0. You just DO WHAT THE FUCK YOU WANT TO.
 
 use strict;
 use warnings;
@@ -37,31 +37,31 @@ $ua = LWP::UserAgent->new();
 $ua->agent( 'Mozilla/5.0 Gecko/2009090217 Firefox' );
 $ua->timeout( 60 );
 my $cookie_jar = HTTP::Cookies->new(
-	file => 'pixiv_cookie',
-	autosave => '1',
+        file => 'pixiv_cookie',
+        autosave => '1',
 );
 $ua->cookie_jar( $cookie_jar );
 
 # Log in
 $ua->get( 'http://www.pixiv.net/' ) or die( 'Getting mainpage failed.' );
 $ua->post(
-	'http://www.pixiv.net/index.php',
-	Content => [
-		mode  => 'login',
-		pixiv_id => $PIXIV_ID,
-		pass => $PASSWORD,
-	],
+        'http://www.pixiv.net/index.php',
+        Content => [
+                mode  => 'login',
+                pixiv_id => $PIXIV_ID,
+                pass => $PASSWORD,
+        ],
 ) or die "Login failed!";
 
 # Grab New Illust
 my $res = $ua->get( 'http://www.pixiv.net/bookmark_new_illust.php' );
 if( !$res->is_success() ) {
-	die( "Getting new illust failed." );
+        die( "Getting new illust failed." );
 }
 
 # Preparse
 my $html = $res->content();
-$html =~ s/<section id="search-result" class="image-list">(.*)<\/section>/$1/s;
+$html =~ s/.*<div class="search_a2_result linkStyleWorks">(.*)<div class="clear">.*<style type="text\/css"><!--.*/$1/s;
 
 # Output header
 print <<RSS
@@ -80,40 +80,43 @@ RSS
 ;
 
 # Parse and output.
-while( $html =~ /<a href="([^"]*)".*?<img src="([^"]*)".*?<h1>([^<>]*)<\/h1>.*?<a href=.*?>([^<>]*)<\/a>/gi ) {
+while( $html =~ /(mode=medium&amp;illust_id=\d*)".*?<img src="([^"]*)".*?<h2>([^<>]*)<\/h2>/gi ) {
 
-	# Get fields.
-	my $desc = $3;
-	my $url = $1;
-	my $thumb = $2;
-	my ($user,$thumb_file) = ($thumb =~ m|img/([^/]*)/(.*)$|);
 
-	# Sanitize. You never know. YOU NEVER KNOW.
-	$thumb_file =~ s/(?:\.\.|\$|\/)//gi;
-	my $thumb_save = $IMAGE_DIR . $thumb_file;
-	
-	# Grab thumb, if need to.
-	if( !-e $thumb_file ) {
-		system(
-			'wget',
-			'-q',
-			'--referer=http://www.pixiv.net/',
-			'--user-agent=Mozilla/5.0 Gecko/2009090217 Firefox',
-			'-O',
-			$thumb_save,
-			$thumb,
-		);
-	}
-	
-	# Build RSS item.
-	print "<item>\n";
-	print "<title>$user: $desc</title>\n";
-	print "<description><![CDATA[";
-	print '<img src="' . $IMAGE_BASE_URL . $thumb_file . '" />';
-	print "]]></description>\n";
-	print "<guid>http://www.pixiv.net$url</guid>\n";
-	print "<link>http://www.pixiv.net$url</link>\n";
-	print "</item>\n";
+        # Get fields.
+        my $desc = $3;
+        my $url = $1;
+        $url = "/member_illust.php?$url";
+        my $thumb = $2;
+        my ($user,$thumb_file) = ($thumb =~ m|img/([^/]*)/(.*)$|);
+
+        # Sanitize. You never know. YOU NEVER KNOW.
+        $thumb_file =~ s/(?:\.\.|\$|\/)//gi;
+        my $thumb_save = $IMAGE_DIR . $thumb_file;
+
+        # Grab thumb, if need to.
+        if( !-e $thumb_file ) {
+                system(
+                        'wget',
+                        '-q',
+                        '--referer=http://www.pixiv.net/',
+                        '--user-agent=Mozilla/5.0 Gecko/2009090217 Firefox',
+                        '-O',
+                        $thumb_save,
+                        $thumb,
+                );
+        }
+
+        # Build RSS item.
+        $url =~ s/&/&amp;/;
+        print "<item>\n";
+        print "<title>$user: $desc</title>\n";
+        print "<description><![CDATA[";
+        print '<img src="' . $IMAGE_BASE_URL . $thumb_file . '" />';
+        print "]]></description>\n";
+        print "<guid>http://www.pixiv.net/$url</guid>\n";
+        print "<link>http://www.pixiv.net/$url</link>\n";
+        print "</item>\n";
 }
 
 # Output footer
