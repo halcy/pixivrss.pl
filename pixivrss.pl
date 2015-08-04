@@ -86,7 +86,7 @@ while( $html =~ /(mode=medium&amp;illust_id=\d*)".*?<h1 class="title" title="([^
         # Get fields.
         my $desc = $2;
         my $url = $1;
-        $url = "/member_illust.php?$url";
+        $url = "member_illust.php?$url";
         my $user = $3;
         my $thumb = $4;
         my ($thumb_file) = ($thumb =~ m|img/[^/]*/(.*)$|);
