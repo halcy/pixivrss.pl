@@ -109,7 +109,6 @@ while( $html =~ /(mode=medium&amp;illust_id=\d*)".*?<h1 class="title" title="([^
         }
 
         # Build RSS item.
-        $url =~ s/&/&amp;/;
         print "<item>\n";
         print "<title>$user: $desc</title>\n";
         print "<description><![CDATA[";
