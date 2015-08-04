@@ -45,7 +45,7 @@ $ua->cookie_jar( $cookie_jar );
 # Log in
 $ua->get( 'http://www.pixiv.net/' ) or die( 'Getting mainpage failed.' );
 $ua->post(
-        'http://www.pixiv.net/index.php',
+        'https://www.secure.pixiv.net/login.php',
         Content => [
                 mode  => 'login',
                 pixiv_id => $PIXIV_ID,
