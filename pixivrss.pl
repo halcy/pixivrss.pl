@@ -61,7 +61,7 @@ if( !$res->is_success() ) {
 
 # Preparse
 my $html = $res->content();
-$html =~ s/.*<div class="search_a2_result linkStyleWorks">(.*)<div class="clear">.*<style type="text\/css"><!--.*/$1/s;
+$html =~ s/.*<ul class="_image-items autopagerize_page_element">(.*)<\/ul>.*/$1/s;
 
 # Output header
 print <<RSS
@@ -80,15 +80,16 @@ RSS
 ;
 
 # Parse and output.
-while( $html =~ /(mode=medium&amp;illust_id=\d*)".*?<img src="([^"]*)".*?<h2>([^<>]*)<\/h2>/gi ) {
+while( $html =~ /(mode=medium&amp;illust_id=\d*)".*?<h1 class="title" title="([^"]*)".*?data-user_name="([^"]*)".*?<img src="([^"]*)"/gi ) {
 
 
         # Get fields.
-        my $desc = $3;
+        my $desc = $2;
         my $url = $1;
         $url = "/member_illust.php?$url";
-        my $thumb = $2;
-        my ($user,$thumb_file) = ($thumb =~ m|img/([^/]*)/(.*)$|);
+        my $user = $3;
+        my $thumb = $4;
+        my ($thumb_file) = ($thumb =~ m|img/[^/]*/(.*)$|);
 
         # Sanitize. You never know. YOU NEVER KNOW.
         $thumb_file =~ s/(?:\.\.|\$|\/)//gi;
