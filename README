@@ -4,7 +4,7 @@ To set up, just drop the script in some directory on your web server,
 change the variables under "config" to match your setup, and add the
 scripts URL to your favourite feed reader.
 
-Please make sure you're not hammering Pixivs servers with a lot of
+Please make sure you're not hammering Pixiv's servers with a lot of
 unneccesary requests.
 
 DANGER WILL ROBINSON: This obviously makes something that was private
